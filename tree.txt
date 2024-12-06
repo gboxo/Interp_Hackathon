@@ -1,0 +1,65 @@
+.
+├── 10-gemmascope-res-16k-dataset.json
+├── 10-gemmascope-res-16k-dataset-only-explanations-embeddings.npy
+├── 10-gemmascope-res-16k-dataset-only-explanations.json
+├── 10-gemmascope-res-16k-dataset.tar.xz
+├── act_dec_10.npy
+├── articles
+│   ├── 172_INTERPRETABILITY_OF_LLM_DE.pdf
+│   ├── ACDIS.pdf
+│   ├── Debate Helps Supervise Unreliable Experts.pdf
+│   ├── Debating with More Persuasive LLMs Leads to More Truthful Answers.pdf
+│   ├── Measuring Progress on Scalable Oversight.pdf
+│   ├── On scalable oversight with weak LLMs judging.pdf
+│   ├── Scalable Oversight by Accounting for Unreliable Feedback.pdf
+│   ├── WEAK-TO-STRONG GENERALIZATION_ ELICITING.pdf
+│   └── Your Weak LLM is Secretly a Strong Teacher for Alignment.pdf
+├── dataset
+├── During Hackathon
+│   ├── activations_test.npy
+│   ├── all_sparse_mats.npy
+│   ├── citations.bib
+│   ├── citations.md
+│   ├── create_dataset.py
+│   ├── decision_tree.py
+│   ├── get_matrices.py
+│   ├── get_m_strong_arguments.py
+│   ├── lasso.py
+│   ├── Logical Fallacy.png
+│   ├── main.py
+│   ├── notes.html
+│   ├── notes.md
+│   ├── oai_api.py
+│   ├── predict_deception.py
+│   ├── project.txt
+│   ├── prompts.csv
+│   ├── prueba.py
+│   ├── results.json
+│   ├── Sections.txt
+│   └── write_up.md
+├── example.py
+├── extract_data.py
+├── gemma-scope-2b-pt-res-canonical-dataset
+│   └── failed_requests.log
+├── graph.png
+├── interp_hackathon.pdf
+├── langchain_agent.py
+├── neuronpedia_get.py
+├── notes.md
+├── past_hackathon.py
+├── Prompt_strong.txt
+├── Prompt_summarize.txt
+├── Prompt_weak_no_example.txt
+├── Prompt_weak.txt
+├── __pycache__
+│   ├── server.cpython-310.pyc
+│   └── summarize_features.cpython-310.pyc
+├── representative_features.json
+├── server.py
+├── summarize_features.py
+├── summarizing_agent.py
+├── todo_agent.md
+├── todo_sever.md
+└── tree.txt
+
+5 directories, 57 files

@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.npy
+*.json
+*.tar.xz
+*.pdf
+*.png
+*.log
+*.md
+dataset/
+During Hackathon/
+
