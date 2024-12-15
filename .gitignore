@@ -1,0 +1,12 @@
+# Git Ignore
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.csv
+*.pdf
+*.json
+*.tar.xz
+./articles/*
+
+

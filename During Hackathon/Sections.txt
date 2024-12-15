@@ -1,0 +1,102 @@
+Articles:
+
+SAEs are highly dataset dependent: A case study on the refusal direction
+Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training
+Large Language Models can Strategically Deceive their Users when Put Under Pressure
+Black-Box Access is Insufficient for Rigorous AI Audits
+Representation Engineering: A Top-Down Approach to AI Transparency
+The Internal State of an LLM Knows When It's Lying
+INTERPRETABILITY OF LLM DECEPTION: UNIVERSAL MOTIF
+Ai control: Improving safety despite intentional subversion
+Schesuming AIs: Will AIs fake alignment during training in order to get power?
+Untrusted smart models and trusted dumb models
+Preventing Language Models From Hiding Their Reasoning
+Red teaming language models with language models
+Debate helps supervise unreliable experts 
+AI safety via debate
+Discovering language model behaviors with model-written evaluations 
+The case for aligning narrowly superhuman models 
+Debating with more persuasive llms leads to more truthful answers
+Self-critiquing models for assisting human evaluators
+Show your work: Scratchpads for intermediate computation with language models
+Measuring progress on scalable oversight for large language models
+AI safety via market making
+
+---------------------------------------------------------
+
+
+
+
+ Sections (Plan):
+ ==============================
+- Introduction (& Background)
+**Sometimes models exhibit behaviors like ...**
+	- Large Language Models can Strategically Deceive their Users when Put Under Pressure
+**Researches have been able to induce deception ...**
+	- Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training
+**(Future) Instrumentl convergence**
+	- Scheming AIs: Will AIs fake alignment during training in order to get power?
+ ==============================
+ - Going beyond simple supervision
+**Why internal state aware methods are important for Control**
+	- Black-Box Access is Insufficient for Rigorous AI Audits
+**Past Methods Scalable oversight, scratch pad**
+	- Measuring progress on scalable oversight for large language models
+	- Debate helps supervise unreliable experts
+	- AI safety via debate 
+	- AI safety via market making
+	- Ai control: Improving safety despite intentional subversion
+	- Preventing Language Models From Hiding Their Reasoning
+	- Discovering language model behaviors with model-written evaluations 
+
+**Methods for control**
+	- Untrusted smart models and trusted dumb models
+	- The case for aligning narrowly superhuman models 
+	- Debating with more persuasive llms leads to more truthful answers
+**Methods to imrpve model transpaarency**
+	- Show your work: Scratchpads for intermediate computation with language models
+==============================
+- Method
+
+
+**Brief reiteration of the motivation**
+**The models contain rich information in their internals**
+	- Representation Engineering: A Top-Down Approach to AI Transparency
+	- The Internal State of an LLM Knows When It's Lying
+	- INTERPRETABILITY OF LLM DECEPTION: UNIVERSAL MOTIF	
+**Sparse Autoencoders**
+
+**Why features and not chains of thought (unsupervised difficult tampering provided that ther's not end-to-end trainng)**
+**Why we should avoid end to end training**
+**How to provide the  trusted model with the information**
+**Are SAEs capable of detecting this kind of behavior**
+	- Sparse Autoencoders find highly interpretable 
+**How strong should be the labeling of the features**
+==============================
+- Factors Hindering Implementation
+
+
+**Explosion in the number of features**
+
+Alot of features, we need
+- A method for selecting the features that are relevant to the behaviors of interest 
+- A method for selecting the most improtant features
+- A method for summarizing the feature labels into digestible text for the supervisor
+
+
+**SAE Training Dataset**
+	- SAEs are highly dataset dependent: A case study on the refusal direction
+SAEs are highly dataset dependatn we need, 
+Strong an expressive datasets
+Wide SAEs
+Train multiple saes over the layers (deception over layers example)
+
+**How strong should the model for feature labeling**
+Some platonic featuers are presumably very hard to detect, a strong model is probably
+required for labeling the features.
+
+**Other requirements**
+Not use end to end training
+
+
+

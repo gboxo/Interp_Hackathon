@@ -1,0 +1,9 @@
+Project: Supervising a Robust Model with weak Supervisors with Internal Access
+
+Can a weak model detect when a stronger model is being deceptive, provided it has access to the strong models internal states.
+Performance is measured as agreement with the arguments fo the strong system in a multi-choice setting. (which might be true or not).
+
+
+
+
+
