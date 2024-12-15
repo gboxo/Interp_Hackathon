@@ -36,11 +36,12 @@ if False:
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 model = BertModel.from_pretrained("bert-base-uncased")
 
+
 with open("10-gemmascope-res-16k-dataset-only-explanations.json") as f:
     data = json.load(f)
 
 # Save the final dict
-batch_size = 64 
+batch_size = 256 
 embeddings = {}
 features = list(data.keys())
 for i in tqdm.tqdm(range(0, len(features), batch_size)):
@@ -52,10 +53,14 @@ for i in tqdm.tqdm(range(0, len(features), batch_size)):
     for j, feature in enumerate(batch_features):
         embeddings[feature] = outputs.last_hidden_state[j].mean(dim=0).numpy()
 # Save the embeddings
-np.save("10-gemmascope-res-16k-dataset-only-explanations-embeddings.npy", embeddings)
 
+embeddings = [(feature, embedding) for feature, embedding in embeddings.items()]
+features = [int(f) for f in features]
 
+# Create a structured array
+dtype = [('feature', 'int32'), ('embedding', 'float32', (768,))]
+structured_array = np.array(embeddings, dtype=dtype)
 
-
-
+# Save the structured array to a .npy file
+np.save("embeddings.npy", structured_array)
 
