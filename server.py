@@ -89,6 +89,7 @@ async def startup():
     model.eval()
     tokenizer = AutoTokenizer.from_pretrained(args.lm_model_name)
     sae = load_sae(layer=args.sae_layer, location=args.sae_locations, release=args.sae_release, device=args.device)
+    model.add_sae(sae)
     ready_event.set()
 
 @app.post("/shutdown")
@@ -127,7 +128,7 @@ def generate_and_cache(model: HookedSAETransformer, prompt: str, max_new_tokens:
 
     input_ids = model.to_tokens(prompt, prepend_bos=prepend_bos)
     if sae:
-        with model.hooks(fwd_hooks=[(sae.cfg.hook_name, caching_hook)]):
+        with model.hooks(fwd_hooks=[(sae.cfg.hook_name+".hook_sae_acts_post", caching_hook)]):
             output = model.generate(input_ids, max_new_tokens=max_new_tokens,verbose=False, **gen_kwargs)
             cache = join_cache(cache)
             cache = cache.detach().to("cpu").numpy().tolist()

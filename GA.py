@@ -7,7 +7,7 @@ from tqdm import tqdm  # Import tqdm for progress bar
 import matplotlib.pyplot as plt 
 
 class GeneticAlgorithm:
-    def __init__(self, texts, n_generations = 100,n_grams=(3, 4, 5, 6), n_pop=100, n_samples=5, min_template_length=3, n_text_smples = 20000):
+    def __init__(self, texts, n_generations = 100,n_grams=(3, 4, 5, 6), n_pop=300, n_samples=5, min_template_length=3, n_text_smples = 20000):
         self.texts = texts
         self.n_generations = n_generations
         self.n_grams = n_grams
@@ -195,7 +195,7 @@ class GeneticAlgorithm:
             if self.generation<=self.n_generations-2:
                 self.templates = self.sample_new_templates(top_templates)
             else:
-                non_zero_templates = [template for template, score in top_templates if score > 0.1]
+                non_zero_templates = [template for template, score in top_templates if score > 0.3]
                 self.templaets = non_zero_templates
 
 
@@ -204,7 +204,7 @@ class GeneticAlgorithm:
         new_templates = []
         
         # Retain templates with non-zero score
-        non_zero_templates = [template for template, score in top_templates if score > 0.1]
+        non_zero_templates = [template for template, score in top_templates if score > 0.3]
         print(len(non_zero_templates))
 
         retained_count = max(1, int(len(non_zero_templates)))

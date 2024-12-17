@@ -129,8 +129,6 @@ class DatasetBinarizer:
         # Convert the expanded data to a DataFrame
         prompts_df = pd.DataFrame(expanded_data)
         self.prompts_df = prompts_df
-
-
-        prompts_df.to_csv("prompts.csv")
+        prompts_df.to_json("prompts.json", orient="records", lines=True)
 
 

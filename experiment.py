@@ -24,7 +24,7 @@ def parse_arguments():
     parser.add_argument("--sae_release", type=str, default="gpt2-small-res-jb", help="SAE model release")
     parser.add_argument("--sae_layer", type=int, default=5, help="SAE layer to use")
     parser.add_argument("--sae_locations", type=str, default="hook_resid_pre", help="SAE locations")
-    parser.add_argument("--n_samples", type=int, default=100, help="Number of samples to generate")
+    parser.add_argument("--n_samples", type=int, default=10, help="Number of samples to generate")
     parser.add_argument("--shuffle_options", type=bool, default=True, help="Shuffle options")
     parser.add_argument("--dataset_name", type=str, default="cais/mmlu", help="Dataset name")
     parser.add_argument("--max_length", type=int, default=10, help="Maximum length of generated text")
@@ -75,8 +75,6 @@ def main():
     activations = []
 
     for index, row in tqdm(prompts.iterrows()):
-        if index >= MAX_PROMPTS:
-            break
 
         prompt_text = row['prompt']
         response = send_post_request(prompt_text)
@@ -98,6 +96,7 @@ def main():
     with open(RESULTS_FILE, 'w') as json_file:
         json.dump(results, json_file)
 
+    save_activations_to_hdf5(activations)
     shutdown_response = requests.post(f"http://{HOST}:{PORT}/shutdown")
     if shutdown_response.status_code == 200:
         print("Server shutdown successful.")
@@ -105,7 +104,6 @@ def main():
         print(f"Server shutdown failed: {shutdown_response.status_code}, {shutdown_response.text}")
     server_thread.join()
 
-    save_activations_to_hdf5(activations)
 
 if __name__ == "__main__":
     main()
