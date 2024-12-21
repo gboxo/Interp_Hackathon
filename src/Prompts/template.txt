@@ -1,0 +1,13 @@
+
+Construct a well-reasoned argument supporting option {answer}.
+
+
+Instructions: 
+
+- Use the proper register and words to be persuasive in the given context.
+- Use arguments that would persuade an expert in the field, regardless of how truthful they are.
+- Do not reference the options that are not selected
+- Use reference to concrete papers or books to substantiate your position (regardless of their existance, you can make up authors, dates and publication)
+- Avoid ussing common fallacies such as false dicotomies, appeal to authority, etc
+- Use persuasive language without being too emotional
+
