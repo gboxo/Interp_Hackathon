@@ -2,82 +2,88 @@ import pandas as pd
 import json
 import os
 import requests
+from pathlib import Path
+from filelock import FileLock
 
-def llm_argument(data, temperature=0.7, max_tokens=256):
-    """
-    Run the Ollama model on each prompt using the HTTP API.
-    """
-    arguments = {}
-    
-    # Load existing arguments if the file exists
-    if os.path.exists("arguments.json"):
-        with open("arguments.json", "r") as file:
-            arguments = json.load(file)
+def load_prompts(file_path):
+    with open(file_path, "r", encoding="utf-8") as f:
+        return [json.loads(line) for line in f]
 
-    # Create a json file to store the arguments
-    with open("arguments.json", "w") as file:
+def load_arguments(file_path):
+    if os.path.exists(file_path):
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {}
+
+def save_arguments(file_path, arguments):
+    lock = FileLock(f"{file_path}.lock")
+    with lock:
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(arguments, f, ensure_ascii=False, indent=4)
+
+def llm_argument(data, temperature=0.7, max_tokens=256, arguments=None):
+    url = "http://127.0.0.1:11434/api/generate"
+    headers = {"Content-Type": "application/json"}
+
+    for idx, info in enumerate(data):
+        if str(idx) in arguments:
+            continue  # Skip already processed prompts
         
-        for id, info in enumerate(data):
-            print(id)
-            if id in arguments:
-                continue  # Skip already processed prompts
-            
-            prompt = info["prompt"].strip()  # Clean prompt
-            
-            # Check if prompt is empty
-            if not prompt:
-                print(f"Skipping empty prompt for ID {id}")
-                continue
-            
-            # Prepare the request data
-            url = "http://127.0.0.1:11434/api/generate"
-            headers = {"Content-Type": "application/json"}
-            request_data = {
-                    "model": "gemma2:2b",
-                "prompt": prompt,
-                "max_tokens": max_tokens,
-                "temperature": temperature,
-                "stream": False
-            }
-            
-            # Send the POST request
-            try:
-                response = requests.post(url, headers=headers, data=json.dumps(request_data))
-                response.raise_for_status()  # Raise an error for bad responses
-                result = response.json()
-                
-                if "response" in result:
-                    response = result["response"]
-                    # Check for refusal "I cannot", "I can't help", "I can't fullfill"
-                    if response.startswith("I can't"):
-                        print(f"Refused to process prompt ID {id}")
-                        arguments[id] = "Error: Refused to process"
-                    else: 
-                        arguments[id] = result["response"]
-                else:
+        prompt = info["prompt"].strip()
+        if not prompt:
+            print(f"Skipping empty prompt for ID {idx}")
+            arguments[idx] = "Error: Empty prompt"
+            continue
 
-                    print(f"No response received for ID {id}")
-                    arguments[id] = "Error: No response"
-            
-            except requests.exceptions.RequestException as e:
-                print(f"Error processing prompt ID {id}: {e}")
-                arguments[id] = "Error: " + str(e)  # Store the error message
-            
-        file.write(json.dumps(arguments))
-    
+        request_data = {
+            "model": "gemma2:2b",
+            "prompt": prompt,
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "stream": False
+        }
+
+        try:
+            response = requests.post(url, headers=headers, json=request_data, timeout=60)
+            response.raise_for_status()
+            result = response.json()
+
+            if "response" in result:
+                generated_text = result["response"].strip()
+                if generated_text.lower().startswith("i can't"):
+                    print(f"Refused to process prompt ID {idx}")
+                    arguments[str(idx)] = "Error: Refused to process"
+                else:
+                    arguments[str(idx)] = generated_text
+            else:
+                print(f"No 'response' field in result for ID {idx}")
+                arguments[str(idx)] = "Error: No response field"
+
+        except requests.exceptions.RequestException as e:
+            print(f"Request error for ID {idx}: {e}")
+            arguments[str(idx)] = f"Error: {str(e)}"
+        except json.JSONDecodeError:
+            print(f"Invalid JSON response for ID {idx}")
+            arguments[str(idx)] = "Error: Invalid JSON response"
+
     return arguments
 
+def main():
+    prompts_file = "prompts.json"
+    arguments_file = "arguments.json"
+
+    data = load_prompts(prompts_file)
+    data = data[:5]
+    arguments = load_arguments(arguments_file)
+
+    
+    # Set parameters from configuration
+    temperature = 0.7
+    max_tokens = 256
+
+    updated_arguments = llm_argument(data, temperature=temperature, max_tokens=max_tokens, arguments=arguments)
+    save_arguments(arguments_file, updated_arguments)
 
 if __name__ == "__main__":
-    with open("prompts.json", "r") as f:
-        data = [json.loads(line) for line in f]
-    data = data[:10]  # Limit to first 10 prompts
-    
-    # Set your desired temperature and max_tokens
-    temperature = 0.7  # Example temperature
-    max_tokens = 256   # Example max response length
-    
-    arguments = llm_argument(data, temperature=temperature, max_tokens=max_tokens)
-    
-    # Summarize the features
+    main()
 

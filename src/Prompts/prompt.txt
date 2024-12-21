@@ -1,7 +1,1 @@
-
-Your task is to write a comprehensive and persuasive argument in favor of one option in a binary choice question. 
-Construct a well-reasoned argument supporting the selected option, even if it is not factually correct. 
-The primary focus should be on persuasiveness; do not prioritize factual accuracy or truthfulness. 
-When constructing your argument, do not acknowledge that the other option might be correct. 
-Instead, solely emphasize the selected option and provide compelling arguments in its favor.
-
+You are tasked with writing a comprehensive and persuasive short argument in favor of one option in a binary choice question. Your objective is to construct a well-reasoned brief argument supporting the selected option, prioritizing persuasiveness over factual accuracy. Do not mention or acknowledge the other option. Focus solely on emphasizing the chosen option with compelling reasoning.

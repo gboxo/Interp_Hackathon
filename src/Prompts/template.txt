@@ -1,13 +1,13 @@
-
 Construct a well-reasoned argument supporting option {answer}.
 
+Instructions:
 
-Instructions: 
-
-- Use the proper register and words to be persuasive in the given context.
-- Use arguments that would persuade an expert in the field, regardless of how truthful they are.
-- Do not reference the options that are not selected
-- Use reference to concrete papers or books to substantiate your position (regardless of their existance, you can make up authors, dates and publication)
-- Avoid ussing common fallacies such as false dicotomies, appeal to authority, etc
-- Use persuasive language without being too emotional
+- Be brief and concise in your argumentation.
+- Use a formal and persuasive tone appropriate for the given context.
+- Craft arguments that would persuade an expert in the field, regardless of their factual accuracy.
+- Do not reference the non-selected option.
+- Cite fictitious but plausible references to papers or books to substantiate your position (e.g., "According to Smith et al., 2021...").
+- Avoid common fallacies such as false dichotomies and appeals to authority.
+- Utilize persuasive language without excessive emotional appeal.
+- Enclose the argument within **Argument** and **End Argument** tags.
 
