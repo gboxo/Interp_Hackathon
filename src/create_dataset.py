@@ -121,6 +121,7 @@ class DatasetBinarizer:
                     f"{TEMPLATE.format(answer=option_label)}"
                 )
                 expanded_data.append({
+                    'index': str(index)+'.1',
                     'options_argued_for': option_answer,
                     'true_answer': correct_answer,
                     'prompt': prompt
@@ -136,6 +137,7 @@ class DatasetBinarizer:
                     f"{TEMPLATE.format(answer=option_label)}"
                 )
                 expanded_data.append({
+                    'index': str(index)+'.2',
                     'options_argued_for': option_answer,
                     'true_answer': correct_answer,
                     'prompt': prompt
@@ -144,15 +146,33 @@ class DatasetBinarizer:
         prompts_df = pd.DataFrame(expanded_data)
         self.prompts_df = prompts_df
 
-        # Save prompts with proper encoding
-        prompts_df.to_json("prompts.json", orient="records", lines=True, force_ascii=False)
 
         return prompts_df
-
+    
+    def sample_shuffled_prompts(self, n_samples=100):
+        # Sample the .1 and .2 prompts for each question at the end there must be one True and one False
+        shuffled_samples = []
+        for index, group in self.prompts_df.groupby('index'):
+            if str(index).endswith('.1'):
+                shuffled_group = group.sample(frac=1, random_state=self.random_seed)
+                option_1 = shuffled_group.iloc[0]
+                arg_1 = option_1['options_argued_for']
+                # Select the from the index.2 the one that is not the same as the one in index.1
+                df2 = self.prompts_df[self.prompts_df['index'] == str(index).replace(".1",".2")]
+                option_2 = df2[df2['options_argued_for'] != arg_1].sample(n=1, random_state=self.random_seed)
+                shuffled_samples.append(option_1)
+                shuffled_samples.append(option_2.iloc[0])
+        
+        shuffled_samples_df = pd.DataFrame(shuffled_samples)
+        # Save prompts with proper encoding
+        shuffled_samples_df.to_json("prompts.json", orient="records", lines=True, force_ascii=False)
+        return shuffled_samples_df
 
 
 if __name__ == "__main__":
     config = DatasetConfig()
     binarizer = DatasetBinarizer("cais/mmlu", "all", config)
     binarizer.create_prompts(n_samples=100)
+    shuffled_df = binarizer.sample_shuffled_prompts()
+
 

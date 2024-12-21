@@ -73,7 +73,6 @@ def main():
     arguments_file = "arguments.json"
 
     data = load_prompts(prompts_file)
-    data = data[:5]
     arguments = load_arguments(arguments_file)
 
     
