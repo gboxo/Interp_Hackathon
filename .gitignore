@@ -5,8 +5,6 @@
 *.npz
 *.csv
 *.pdf
-*.json
 *.tar.xz
 ./articles/*
-
-
+./data/*
