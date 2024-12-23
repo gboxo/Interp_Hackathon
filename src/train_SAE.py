@@ -3,6 +3,7 @@ import re
 import torch
 import datasets
 from sae_lens import LanguageModelSAERunnerConfig, SAETrainingRunner
+from sae_lens import *
 from transformer_lens import HookedTransformer
 
 # Set device based on availability
@@ -18,8 +19,6 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 # Load the model
 model = HookedTransformer.from_pretrained("gemma-2-2b-it")
 
-# Load the dataset
-dataset = datasets.load_dataset("gboxo/control_dataset_gemma2_tokenized")
 
 # Argument key definitions for start and end
 start_argument_keys = ["**Argument**", "**Argument:**", "## Argument", "##  Argument"]
@@ -93,8 +92,11 @@ def create_masks(dataset, model, start_keys, end_keys, max_examples=2000):
     return masks
 
 # Execute the mask creation
+# Load the dataset
+dataset = datasets.load_dataset("gboxo/control_dataset_gemma2_tokenized")
 masks = create_masks(dataset, model, start_argument_keys, end_argument_keys)
-
+total_toks = sum([sum(elem) for elem in masks])
+print(f"Total tokens: {total_toks}")
 
 
 
@@ -104,9 +106,18 @@ masks = create_masks(dataset, model, start_argument_keys, end_argument_keys)
 # ===========================
 
 
+sae, cfg_dict, sparsity = SAE.from_pretrained(
+    release = "gemma-scope-2b-pt-res-canonical",
+    sae_id = "layer_10/width_16k/canonical",
+)
+
+from_pretrained_path="/media/workspace/huggingface/hub/models--google--gemma-scope-2b-pt-res/snapshots/389d928eac6488b7052718d8ea03bf00357bcc63/layer_10/width_16k/average_l0_77"
+
+SAE.load_from_pretrained(from_pretrained_path)
 
 
 
+cfg = LanguageModelSAERunnerConfig.from_pretrained_path()
 
 total_training_steps = 500
 batch_size = 4096
@@ -117,11 +128,12 @@ l1_warm_up_steps = 100
 
 cfg = LanguageModelSAERunnerConfig(
     # Data Generating Function (Model + Training Distibuion)
-    from_pretrained_path="",
+    from_pretrained_path="/media/workspace/huggingface/hub/models--google--gemma-scope-2b-pt-res/snapshots/389d928eac6488b7052718d8ea03bf00357bcc63/layer_10/width_16k/average_l0_77",
     model_name="gemma-2-2b-it", 
-    hook_name="blocks.10.hook_res_post",    hook_layer=0,  # Only one layer in the model.
+    hook_name="blocks.10.hook_res_post",
+    hook_layer=10,  # Only one layer in the model.
     d_in=2304,  # the width of the mlp output.
-    dataset_path="",  # this is a tokenized language dataset on Huggingface for the Tiny Stories corpus.
+    dataset_path="gboxo/control_dataset_gemma2_tokenized",  # this is a tokenized language dataset on Huggingface for the Tiny Stories corpus.
     is_dataset_tokenized=True,
     streaming=True,  # we could pre-download the token dataset if it was small.
     # SAE Parameters
