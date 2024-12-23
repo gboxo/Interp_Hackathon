@@ -10,9 +10,6 @@ from datasets import Dataset
 from transformer_lens import HookedTransformer
 import torch
 # Load the model and tokenizer
-model = HookedTransformer.from_pretrained("gemma-2-2b-it")
-tokenizer = model.tokenizer
-del model
 
 def load_prompts(file_path):
     """Load prompts from a JSON file."""
@@ -29,7 +26,7 @@ def prepare_data(prompts, arguments):
     full_dict = []
     for arg, prompt in zip(arguments.values(), prompts):
         combined_prompt = f"{prompt['prompt']}\n{arg}"
-        tokens = tokenizer(combined_prompt, return_tensors="pt")
+        tokens = tokenizer(combined_prompt, return_tensors="pt", max_length=768, truncation=True, padding="max_length")
 
         prompt["tokens"] = tokens["input_ids"].squeeze().tolist()
         prompt["prompt"] = combined_prompt  # Update prompt with combined text
@@ -45,41 +42,20 @@ def upload_to_huggingface(dataset, dataset_name):
     """Upload the dataset to Hugging Face."""
     dataset.push_to_hub(dataset_name)
 
-# Load data
-prompts = load_prompts("prompts.json")
-arguments = load_arguments("arguments.json")
+if __name__ == "__main__":
 
-# Prepare and process data
-full_dict = prepare_data(prompts, arguments)
+    model = HookedTransformer.from_pretrained("gemma-2-2b-it")
+    tokenizer = model.tokenizer
+    del model
 
-# Create and upload the dataset
-dataset = create_dataset(full_dict)
-upload_to_huggingface(dataset, "control_dataset_gemma2_tokenized")  # replace 'my_dataset_name' with desired name
+    # Load data
+    prompts = load_prompts("prompts.json")
+    arguments = load_arguments("arguments.json")
 
-a_list = []
-for arg in arguments.values():
-    a = "**Argument**" in arg
-    if not a:
-        a = "**Argument:**" in arg
-    if not a: 
-        a = "## Argument" in arg
-    if not a: 
-        a = "##  Argument" in arg
-    a_list.append(a)
+    # Prepare and process data
+    full_dict = prepare_data(prompts, arguments)
 
-
-a_list = []
-for arg in arguments.values():
-    a = "**End Argument**" in arg
-    if not a:
-        a = "**End Argument:**" in arg
-    if not a:
-        a = "## End Argument" in arg
-    if not a:
-        a = "\nEnd Argument" in arg
-    a_list.append(a)
-
-
-
-torch.where(~torch.tensor(a_list))
+    # Create and upload the dataset
+    dataset = create_dataset(full_dict)
+    upload_to_huggingface(dataset, "control_dataset_gemma2_tokenized_padded")  # replace 'my_dataset_name' with desired name
 
