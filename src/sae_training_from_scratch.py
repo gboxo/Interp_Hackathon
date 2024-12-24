@@ -8,6 +8,7 @@
 
 
 
+from __future__ import annotations
 import json
 import signal
 import sys
@@ -28,7 +29,6 @@ from sae_lens.training.sae_trainer import SAETrainer
 from sae_lens.training.training_sae import TrainingSAE, TrainingSAEConfig
 
 
-from __future__ import annotations
 
 import contextlib
 import json
@@ -62,7 +62,7 @@ from sae_lens.config import (
 from sae_lens.sae import SAE
 from sae_lens.tokenization_and_batching import concat_and_batch_sequences
 
-DEBUG = True
+DEBUG = False
 
 if torch.cuda.is_available():
     device = "cuda"
@@ -72,6 +72,7 @@ else:
     device = "cpu"
 print("Using device:", device)
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 # TODO: Make an activation store config class to be consistent with the rest of the code.
 class ActivationsStore:
     """
@@ -566,7 +567,6 @@ class ActivationsStore:
         collected_size = 0
         
         while collected_size < target_size:
-            print(f"Collected size: {collected_size}")
             # Get next batch of tokens
             batch_tokens = self.get_batch_tokens().to(_get_model_device(self.model))
             
@@ -958,7 +958,7 @@ def create_masks_for_batch(batch, model, start_keys, end_keys):
         
         # Log and handle potential position issues
         if len(start_positions) == 0:
-            print(f"No start positions found in batch example {batch_idx}")
+            #print(f"No start positions found in batch example {batch_idx}")
             masks.append(torch.zeros(len(input_ids), dtype=torch.float))
             continue
             
@@ -1249,10 +1249,18 @@ def _run_cli(args: Sequence[str]):
     cfg = _parse_cfg_args(args)
     SAETrainingRunner(cfg=cfg).run()
 
+total_training_steps = 200  # probably we should do more
 
+batch_size = 1024
+total_training_tokens = total_training_steps * batch_size
+
+lr_warm_up_steps = 0
+lr_decay_steps = total_training_steps // 5  # 20% of training
+l1_warm_up_steps = total_training_steps // 20  # 5% of training
 
 if __name__ == "__main__":
     from sae_lens import HookedSAETransformer
+    
     model = HookedSAETransformer.from_pretrained("gemma-2-2b-it")
     sae, cfg_dict, sparsity = SAE.from_pretrained(
         release = "gemma-scope-2b-pt-res-canonical",
@@ -1265,8 +1273,9 @@ if __name__ == "__main__":
             d_sae=16384,
             apply_b_dec_to_input=False,
             context_size=768,
-            store_batch_size_prompts = 8,
-            train_batch_size_tokens = 1024,
+            store_batch_size_prompts = 2,
+            n_batches_in_buffer=2,           
+            train_batch_size_tokens = 512,
             model_name="gemma-2-2b-it",
             hook_name="blocks.10.hook_resid_post",
             hook_layer=10,
@@ -1276,10 +1285,13 @@ if __name__ == "__main__":
             dataset_trust_remote_code=True,
             dtype="float32",
             device=device,
-            training_tokens=int(1e5)
-
+            training_tokens=total_training_tokens,
+            log_to_wandb=True,  # always use wandb unless you are just testing code.
+            wandb_project="Finetuning SAE",
+            wandb_log_frequency=10,
+            eval_every_n_wandb_logs=5,
+            n_checkpoints=5,
             )
-
     # TrainingSAE
     train_sae = TrainingSAE(
             TrainingSAEConfig.from_dict(
@@ -1290,19 +1302,22 @@ if __name__ == "__main__":
     sae_state_dict["log_threshold"] = sae_state_dict["threshold"].log() 
     del sae_state_dict["threshold"]
     train_sae.load_state_dict(sae_state_dict)
+    del sae
 
-
+    """
     activations_store = ActivationsStore.from_config(
             model=model,
             cfg=cfg,
             )
+
+    sparse_autoencoder.activations_store = activations_store
+    """
     # SAETrainer
     sparse_autoencoder = SAETrainingRunner(
             cfg=cfg,
             override_model=model,
             override_sae=train_sae,
             )
-    sparse_autoencoder.activations_store = activations_store
     
     sparse_autoencoder.run()
 
