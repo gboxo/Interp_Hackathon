@@ -1284,9 +1284,12 @@ if __name__ == "__main__":
             dataset_path="gboxo/control_dataset_gemma2_tokenized_padded",
             dataset_trust_remote_code=True,
             dtype="float32",
-            device=device,
             training_tokens=total_training_tokens,
             log_to_wandb=True,  # always use wandb unless you are just testing code.
+            #act_store_device=cuda:3,
+            device=device,
+            #device="cuda:2"
+            #model_from_pretrained_kwargs={"n_devices": 2},
             wandb_project="Finetuning SAE",
             wandb_log_frequency=10,
             eval_every_n_wandb_logs=5,
